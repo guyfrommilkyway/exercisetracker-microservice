@@ -1,7 +1,7 @@
 const express = require('express');
 
-const { getUsers, createUser } = require('../services/User');
-const { createExercise } = require('../services/Exercise');
+const { getUsers, getUser, createUser } = require('../services/User');
+const { createExercise, getExercise } = require('../services/Exercise');
 const { getLogs, getLog, createLog, updateLog } = require('../services/Log');
 
 const router = new express.Router();
@@ -26,6 +26,11 @@ router
 			if (!username) throw new Error('Username cannot be empty.');
 
 			const user = await createUser(username);
+			const log = await createLog({
+				username: user._id,
+				count: 0,
+				log: [],
+			});
 
 			res.status(200).json(user);
 		} catch (e) {
@@ -43,19 +48,18 @@ router.post('/api/users/:userId/exercises', async (req, res) => {
 		if (!description || !duration || !userId)
 			throw new Error('Missing fields.');
 
-		const exercise = await createExercise(userId, description, duration, date);
+		const user = await getUser(userId);
+
+		if (!user) throw new Error("User doesn't exists.");
+
+		await createExercise(userId, description, duration, date);
+		const exercise = await getExercise(userId);
 		const log = await getLog(userId);
 
-		log
-			? await updateLog(userId, {
-					count: log.count + 1,
-					log: [...log.log, exercise._id],
-			  })
-			: await createLog({
-					username: userId,
-					count: 1,
-					log: [exercise._id],
-			  });
+		await updateLog(userId, {
+			count: log.count + 1,
+			log: [...log.log, exercise._id],
+		});
 
 		res.status(200).json(exercise);
 	} catch (e) {
@@ -69,7 +73,11 @@ router.get('/api/users/:userId/logs', async (req, res) => {
 	try {
 		const { userId } = req.params;
 
-		if (!userId) throw new Error('Provide a user');
+		if (!userId) throw new Error('Provide a user id');
+
+		const user = await getUser(userId);
+
+		if (!user) throw new Error("User doesn't exists.");
 
 		const logs = await getLogs(userId);
 
