@@ -4,7 +4,15 @@ const getLogs = async (userId) => {
 	try {
 		const logs = await Log.find({ username: userId })
 			.populate({ path: 'username', transform: (user) => user.username })
-			.populate('log', 'description duration date')
+			.populate({
+				path: 'log',
+				transform: (log) => {
+					delete log._id;
+					delete log.username;
+
+					return log;
+				},
+			})
 			.lean();
 
 		return logs;
