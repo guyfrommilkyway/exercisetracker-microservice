@@ -52,8 +52,8 @@ router.post('/api/users/:userId/exercises', async (req, res) => {
 
 		if (!user) throw new Error("User doesn't exists.");
 
-		await createExercise(userId, description, duration, date);
-		const exercise = await getExercise(userId);
+		const exercise = await createExercise(userId, description, duration, date);
+
 		const log = await getLog(userId);
 
 		await updateLog(userId, {
@@ -61,7 +61,15 @@ router.post('/api/users/:userId/exercises', async (req, res) => {
 			log: [...log.log, exercise._id],
 		});
 
-		res.status(200).json(exercise);
+		const payload = {
+			_id: user._id,
+			username: user.username,
+			description,
+			duration,
+			date,
+		};
+
+		res.status(200).json(payload);
 	} catch (e) {
 		console.log(e);
 
