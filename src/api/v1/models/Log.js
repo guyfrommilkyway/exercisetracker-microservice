@@ -1,17 +1,16 @@
-const mongoose = require('mongoose');
+const { Schema, model } = require('mongoose');
 
-const LogSchema = new mongoose.Schema({
-	username: { type: String, required: true },
+const LogSchema = new Schema({
+	username: { type: Schema.Types.ObjectId, ref: 'User' },
 	count: { type: Number, required: true },
 	log: [
 		{
-			description: { type: String, required: true },
-			duration: { type: Number, required: true },
-			date: { type: Date, required: true },
+			type: Schema.Types.ObjectId,
+			ref: 'Exercise',
 		},
 	],
 });
 
-const Log = mongoose.model('Log', LogSchema);
+const Log = model('Log', LogSchema);
 
 module.exports = Log;
