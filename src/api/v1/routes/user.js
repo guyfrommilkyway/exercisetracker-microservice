@@ -64,9 +64,9 @@ router.post('/api/users/:userId/exercises', async (req, res) => {
 		const payload = {
 			_id: user._id,
 			username: user.username,
-			description,
-			duration,
-			date,
+			description: exercise.description,
+			duration: exercise.duration,
+			date: exercise.date,
 		};
 
 		res.status(200).json(payload);
