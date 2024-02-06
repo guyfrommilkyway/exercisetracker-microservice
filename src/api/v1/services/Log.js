@@ -18,8 +18,6 @@ const getLogs = async (userId, from, to, limit) => {
 			})
 			.lean();
 
-		if (limit) logs.log = logs.log.slice(0, limit);
-
 		switch (Boolean(from).toString() + Boolean(to).toString()) {
 			case 'truetrue':
 				logs.log = logs.log.filter(
@@ -36,6 +34,9 @@ const getLogs = async (userId, from, to, limit) => {
 			// default
 		}
 
+		if (limit) logs.log = logs.log.slice(0, limit);
+
+		logs.count = logs.log.length;
 		logs.log = logs.log.map((log) => {
 			return { ...log, date: log.date.toDateString() };
 		});
