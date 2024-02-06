@@ -24,4 +24,13 @@ const createExercise = async (
 	}
 };
 
-module.exports = { createExercise };
+const getExercise = async (userId) => {
+	const exercise = await Exercise.findOne({ username: userId }).populate({
+		path: 'username',
+		transform: (user) => user.username,
+	});
+
+	return exercise;
+};
+
+module.exports = { createExercise, getExercise };
