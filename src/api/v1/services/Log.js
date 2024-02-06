@@ -24,9 +24,15 @@ const getLogs = async (userId) => {
 };
 
 const getLog = async (userId) => {
-	const log = await Log.findOne({ username: userId }).lean();
+	try {
+		const log = await Log.findOne({ username: userId }).lean();
 
-	return log;
+		return log;
+	} catch (e) {
+		console.log(e);
+
+		return e;
+	}
 };
 
 const createLog = async (data) => {
@@ -38,7 +44,13 @@ const createLog = async (data) => {
 };
 
 const updateLog = async (userId, data) => {
-	await Log.updateOne({ username: userId }, data);
+	try {
+		await Log.updateOne({ username: userId }, data);
+	} catch (e) {
+		console.log(e);
+
+		return e;
+	}
 };
 
-module.exports = { getLog, getLogs, createLog, updateLog };
+module.exports = { getLogs, getLog, createLog, updateLog };
