@@ -1,6 +1,9 @@
 const Log = require('../models/Log');
 
 const getLogs = async (userId, from, to, limit) => {
+	const isValidFrom = (date) => date >= new Date(from);
+	const isValidTo = (date) => date <= new Date(to);
+
 	try {
 		const logs = await Log.findOne({ username: userId })
 			.populate({ path: 'username', transform: (user) => user.username })
@@ -15,31 +18,28 @@ const getLogs = async (userId, from, to, limit) => {
 			})
 			.lean();
 
-		const isValidFrom = (date) => date >= new Date(from);
-		const isValidTo = (date) => date <= new Date(to);
-
-		if (from && to) {
-			logs.log = logs.log.filter(
-				(log) =>
-					isValidFrom(log.date) &&
-					isValidTo(log.date) &&
-					log.date.toDateString()
-			);
+		switch (Boolean(from).toString() + Boolean(to).toString()) {
+			case 'truetrue':
+				logs.log = logs.log.filter(
+					(log) => isValidFrom(log.date) && isValidTo(log.date)
+				);
+				break;
+			case 'truefalse':
+				logs.log = logs.log.filter((log) => isValidFrom(log.date));
+				break;
+			case 'falsetrue':
+				logs.log = logs.log.filter((log) => isValidTo(log.date));
+				break;
+			default:
+			// default
 		}
 
-		if (from && !to) {
-			logs.log = logs.log.filter(
-				(log) => isValidFrom(log.date) && log.date.toDateString()
-			);
-		}
+		if (limit) logs.log = logs.log.slice(0, limit);
 
-		if (!from && to) {
-			logs.log = logs.log.filter(
-				(log) => isValidTo(log.date) && log.date.toDateString()
-			);
-		}
-
-		logs.log = limit ? logs.log.slice(0, limit) : logs.log;
+		logs.count = logs.log.length;
+		logs.log = logs.log.map((log) => {
+			return { ...log, date: log.date.toDateString() };
+		});
 
 		return logs;
 	} catch (e) {
