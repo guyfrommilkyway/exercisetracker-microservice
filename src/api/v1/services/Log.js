@@ -2,7 +2,7 @@ const Log = require('../models/Log');
 
 const getLogs = async (userId) => {
 	try {
-		const logs = await Log.find({ username: userId })
+		const logs = await Log.findOne({ username: userId })
 			.populate({ path: 'username', transform: (user) => user.username })
 			.populate({
 				path: 'log',
