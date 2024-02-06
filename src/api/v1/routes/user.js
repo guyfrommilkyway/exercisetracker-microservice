@@ -66,7 +66,7 @@ router.post('/api/users/:userId/exercises', async (req, res) => {
 			username: user.username,
 			description: exercise.description,
 			duration: exercise.duration,
-			date: exercise.date,
+			date: exercise.date.toDateString(),
 		};
 
 		res.status(200).json(payload);
@@ -80,6 +80,7 @@ router.post('/api/users/:userId/exercises', async (req, res) => {
 router.get('/api/users/:userId/logs', async (req, res) => {
 	try {
 		const { userId } = req.params;
+		const { from, to, limit } = req?.query;
 
 		if (!userId) throw new Error('Provide a user id');
 
@@ -87,7 +88,7 @@ router.get('/api/users/:userId/logs', async (req, res) => {
 
 		if (!user) throw new Error("User doesn't exists.");
 
-		const logs = await getLogs(userId);
+		const logs = await getLogs(userId, from, to, limit);
 
 		res.status(200).json(logs);
 	} catch (e) {
