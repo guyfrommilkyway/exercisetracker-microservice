@@ -15,18 +15,13 @@ const getExercise = async (userId) => {
 	}
 };
 
-const createExercise = async (
-	userId,
-	description,
-	duration,
-	date = new Date().toDateString()
-) => {
+const createExercise = async (userId, description, duration, date) => {
 	try {
 		const exercise = new Exercise({
 			username: userId,
 			description,
 			duration,
-			date: new Date(date).toDateString(),
+			date: date ? new Date(date).toDateString() : new Date().toDateString(),
 		});
 
 		await exercise.save();
