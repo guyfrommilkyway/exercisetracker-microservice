@@ -12,6 +12,18 @@ const getUsers = async () => {
 	}
 };
 
+const getUser = async (userId) => {
+	try {
+		const user = await User.findById(userId);
+
+		return user;
+	} catch (e) {
+		console.log(e);
+
+		return e;
+	}
+};
+
 const createUser = async (username) => {
 	try {
 		const user = new User({
@@ -28,4 +40,4 @@ const createUser = async (username) => {
 	}
 };
 
-module.exports = { getUsers, createUser };
+module.exports = { getUsers, getUser, createUser };
