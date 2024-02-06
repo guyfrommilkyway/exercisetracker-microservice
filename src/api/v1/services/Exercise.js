@@ -1,5 +1,20 @@
 const Exercise = require('../models/Exercise');
 
+const getExercise = async (userId) => {
+	try {
+		const exercise = await Exercise.findOne({ username: userId }).populate({
+			path: 'username',
+			transform: (user) => user.username,
+		});
+
+		return exercise;
+	} catch (e) {
+		console.log(e);
+
+		return e;
+	}
+};
+
 const createExercise = async (
 	userId,
 	description,
@@ -24,13 +39,4 @@ const createExercise = async (
 	}
 };
 
-const getExercise = async (userId) => {
-	const exercise = await Exercise.findOne({ username: userId }).populate({
-		path: 'username',
-		transform: (user) => user.username,
-	});
-
-	return exercise;
-};
-
-module.exports = { createExercise, getExercise };
+module.exports = { getExercise, createExercise };
